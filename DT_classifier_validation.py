@@ -11,7 +11,7 @@ import custom_functions
 
 logging.basicConfig(filename="DT_classifier_validation.log",
                     format='%(asctime)s - %(levelname)s - %(message)s',
-                    datefmt='%m%d%Y %I:%M:%S',
+                    datefmt='%d-%m-%Y %I:%M:%S',
                     level=logging.INFO)
 logger = logging.getLogger("DT_classifier_validation")
 
@@ -43,11 +43,11 @@ classifier = tree.DecisionTreeClassifier()
 estimator = custom_functions.create_estimator(classifier, numeric_data_ind, coord_data_ind, date_data_ind)
 
 param_grid = {
-    'Model_fitting__criterion':['gini',"entropy" ],
+    'Model_fitting__criterion': ['gini',"entropy" ],
     'Model_fitting__splitter': ['best','random'],
-    'Model_fitting__max_depth':np.arange(start=1, stop=10, step=1),
-    'Model_fitting__min_samples_split':np.arange(start=2, stop=20, step=1),
-    'Model_fitting__min_samples_leaf': np.arange(start=1, stop = 10, step = 1),
+    'Model_fitting__max_depth': np.arange(start=1, stop=100, step=1),
+    'Model_fitting__min_samples_split': np.arange(start=2, stop=200, step=1),
+    'Model_fitting__min_samples_leaf': np.arange(start=1, stop=100, step=1),
     'Model_fitting__random_state': [1]
 }
 
@@ -55,7 +55,7 @@ logger.info('Validation')
 grid_cv = model_selection.GridSearchCV(estimator=estimator, param_grid=param_grid, scoring='f1', cv=5)
 grid_cv.fit(X=tr_data, y=tr_target)
 logger.info('Best score: {0}'.format(grid_cv.best_score_))
-print("Best params {0}".format(grid_cv.best_params_))
+logger.info("Best params {0}".format(grid_cv.best_params_))
 b_est = grid_cv.best_estimator_
 pred = b_est.predict(t_data)
 

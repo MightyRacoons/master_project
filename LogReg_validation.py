@@ -5,15 +5,15 @@ import pandas as pd
 import logging
 import logging.config
 # _____module import_______
-from sklearn import metrics, model_selection, ensemble
+from sklearn import metrics, model_selection, linear_model
 
 import custom_functions
 
-logging.basicConfig(filename="RF_classifier_validation.log",
+logging.basicConfig(filename="LogReg_classifier_validation.log",
                     format='%(asctime)s - %(levelname)s - %(message)s',
                     datefmt='%d-%m-%Y %I:%M:%S',
                     level=logging.INFO)
-logger = logging.getLogger("RF_classifier_validation")
+logger = logging.getLogger("LogReg_classifier_validation")
 
 
 # _____data preporation________
@@ -39,18 +39,14 @@ date_data_ind = np.array([(column in date_data_cols) for column in tr_data.colum
 
 # _____Classification task_______
 logger.info('Classification task')
-classifier = ensemble.RandomForestClassifier()
+classifier = linear_model.LogisticRegression()
 estimator = custom_functions.create_estimator(classifier, numeric_data_ind, coord_data_ind, date_data_ind)
 
 param_grid = {
-    'Model_fitting__bootstrap': [True],
-    'Model_fitting__n_estimators': np.arange(1, 400, step=1),
-    'Model_fitting__criterion': ['gini', "entropy"],
-    'Model_fitting__min_samples_leaf': np.arange(1, 200, step=1),
-    'Model_fitting__min_samples_split': np.arange(2, 200, step=1),
-    'Model_fitting__max_features': ['sqrt', 'log2', None],
-    'Model_fitting__oob_score': [True, False],
-    'Model_fitting__random_state': [1]
+    'Model_fitting__C': np.arange(0.1,5.0, step = 0.05),
+    'Model_fitting__penalty': ['l2'],
+    'Model_fitting__solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga'],
+    'Model_fitting__max_iter': np.arange(100, 100000, step=10)
 }
 
 logger.info('Validation')
@@ -64,3 +60,4 @@ pred = b_est.predict(t_data)
 logger.info('Some metrics on test set')
 logger.info(metrics.accuracy_score(t_target, pred))
 logger.info(metrics.classification_report(t_target, pred))
+
