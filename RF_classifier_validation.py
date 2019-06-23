@@ -10,7 +10,7 @@ from sklearn import metrics, model_selection, ensemble
 import custom_functions
 
 logging.basicConfig(filename="RF_classifier_validation.log",
-                    format='%(asctimes) %(level)s %(message)s',
+                    format='%(asctime)s - %(levelname)s - %(message)s',
                     datefmt='%m%d%Y %I:%M:%S',
                     level=logging.INFO)
 logger = logging.getLogger("RF_classifier_validation")
@@ -54,7 +54,7 @@ param_grid = {
 }
 
 logger.info('Validation')
-grid_cv = model_selection.GridSearchCV(estimator=estimator, param_grid=param_grid, scoring='f1_score', cv=5)
+grid_cv = model_selection.GridSearchCV(estimator=estimator, param_grid=param_grid, scoring='f1', cv=5)
 grid_cv.fit(X=tr_data, y=tr_target)
 logger.info('Best score: {0}'.format(grid_cv.best_score_))
 print("Best params {0}".format(grid_cv.best_params_))
