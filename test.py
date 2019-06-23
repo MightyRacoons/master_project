@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import custom_functions
 
 #_____module import_______
 from scipy import stats
@@ -11,78 +12,6 @@ from matplotlib.colors import ListedColormap
 from sklearn import metrics, preprocessing, model_selection, tree, decomposition, ensemble, pipeline, linear_model, svm
 from sklearn.pipeline import Pipeline
 
-#_____custom functions_____
-def plot_2d_data(data, target, colors):
-    plt.figure(figsize = [8,8])
-    x = data[0]
-    plt.scatter(x[:,0], x[:,1],c = target, cmap = colors)
-    plt.show()
-
-def plot_d_surface(estimator, tr_data, tr_labels, t_data, t_labels,colors, light_colors):
-    estimator.fit(tr_data, tr_labels)
-    plt.figure(figsize=(16,8))
-    plt.subplot(1,2,1)
-    xx,yy = np.meshgrid(tr_data[:,0], tr_data[:,1])
-    mesh_pred = np.array(estimator.predict(np.c_[xx.ravel(),yy.ravel()])).reshape(xx.shape)
-    plt.pcolormesh(xx,yy, mesh_pred, cmap=light_colors)
-    plt.scatter(tr_data[:,0], tr_data[:,1], c = tr_labels, cmap = colors)
-    plt.title('Train data, accuracy={:.2f}'.format(metrics.accuracy_score(tr_labels, estimator.predict(tr_data))))
-    plt.subplot(1,2,2)
-    plt.pcolormesh(xx,yy, mesh_pred, cmap=light_colors)
-    plt.scatter(t_data[:,0], t_data[:,1], c = t_labels, cmap = colors)
-    plt.title('Test data, accuracy={:.2f}'.format(metrics.accuracy_score(t_labels,estimator.predict(t_data))))
-    plt.show()
-
-
-def month_mapper(month):
-    m = {
-        'jan': 1,
-        'feb': 2,
-        'mar': 3,
-        'apr':4,
-        'may':5,
-        'jun':6,
-        'jul':7,
-        'aug':8,
-        'sep':9,
-        'oct':10,
-        'nov':11,
-        'dec':12}
-    s = month.strip()[:3].lower()
-    return m[s]
-
-def day_mapper(day):
-    d ={
-        'mon':1,
-        'tue':2,
-        'wed':3,
-        'thu':4,
-        'fri':5,
-        'sat':6,
-        'sun':7
-    }
-    s = day.strip()[:3].lower()
-    return d[s]
-
-def createEstimator(ml_obj):
-    estimator = Pipeline(steps=[
-        ('Feature_processing',pipeline.FeatureUnion(transformer_list=[
-            ('Numeric_features', Pipeline(steps=[
-                ('selecting', preprocessing.FunctionTransformer(lambda data: data[:,numeric_data_ind], validate=True)),
-                ('scaling', preprocessing.StandardScaler(with_mean=0., with_std=1))
-            ])),
-            ('Categical_features', Pipeline(steps=[
-                ('selecting', preprocessing.FunctionTransformer(lambda data: data[:,coord_data_ind], validate=True )),
-                ('hot_encoding', preprocessing.OneHotEncoder(handle_unknown='ignore'))
-            ])),
-            ('Date_features', Pipeline(steps=[
-                ('selecting', preprocessing.FunctionTransformer(lambda data: data[:,date_data_ind], validate=True )),
-                ('hot_encoding', preprocessing.OneHotEncoder(handle_unknown='ignore'))
-            ]))
-        ])),
-        ('Model_fitting', ml_obj)
-    ])
-    return estimator
 
 
 #_____data preporation________
@@ -112,7 +41,7 @@ classifier = ensemble.RandomForestClassifier(n_jobs=-1, bootstrap=True, criterio
 #classifier = linear_model.LogisticRegression(random_state=1, C=0.5, penalty='l2', max_iter=20, solver='lbfgs')
 #classifier = svm.SVC(random_state=1, C=0.75, kernel='poly', degree=2, coef0 = 3.5)
 #classifier = ensemble.GradientBoostingClassifier(random_state=1)
-estimator = createEstimator(classifier)
+estimator = custom_functions.create_estimator(classifier)
 # print(classifier.get_params(deep=True).keys())
 # print(estimator.get_params().keys())
 # param_grid = {
@@ -171,7 +100,7 @@ estimator = createEstimator(classifier)
 #
 
 estimator.fit(X=raw_data, y=class_target)
-pred =estimator.predict(raw_data)
+pred = estimator.predict(raw_data)
 print(metrics.accuracy_score(class_target, pred))
 print(metrics.classification_report(class_target, pred))
 
@@ -207,7 +136,7 @@ target = np.log(target+1)
 
 #
 regressor = ensemble.RandomForestRegressor(n_estimators=43, random_state=1)
-estimator = createEstimator(regressor)
+estimator = custom_functions.create_estimator(regressor)
 estimator.fit(regr_data, target)
 pred = estimator.predict(regr_data)
 print("MAE: {:.2f}".format(metrics.mean_absolute_error(target, pred)))
