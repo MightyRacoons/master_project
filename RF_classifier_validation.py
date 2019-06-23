@@ -44,10 +44,10 @@ estimator = custom_functions.create_estimator(classifier, numeric_data_ind, coor
 
 param_grid = {
     'Model_fitting__bootstrap': [True],
-    'Model_fitting__n_estimators': np.arange(20, 100, step=2),
+    'Model_fitting__n_estimators': np.arange(1, 400, step=1),
     'Model_fitting__criterion': ['gini', "entropy"],
-    'Model_fitting__min_samples_leaf': np.arange(1, 20, step=1),
-    'Model_fitting__min_samples_split': np.arange(2, 20, step=1),
+    'Model_fitting__min_samples_leaf': np.arange(1, 200, step=1),
+    'Model_fitting__min_samples_split': np.arange(2, 200, step=1),
     'Model_fitting__max_features': ['sqrt', 'log2', None],
     'Model_fitting__oob_score': [True, False],
     'Model_fitting__random_state': [1]
@@ -64,9 +64,3 @@ pred = b_est.predict(t_data)
 logger.info('Some metrics on test set')
 logger.info(metrics.accuracy_score(t_target, pred))
 logger.info(metrics.classification_report(t_target, pred))
-
-logger.info("Some metrics in full data")
-estimator.fit(X=raw_data, y=class_target)
-pred = estimator.predict(raw_data)
-print(metrics.accuracy_score(class_target, pred))
-print(metrics.classification_report(class_target, pred))

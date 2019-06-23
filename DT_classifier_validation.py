@@ -63,8 +63,3 @@ logger.info('Some metrics on test set')
 logger.info(metrics.accuracy_score(t_target, pred))
 logger.info(metrics.classification_report(t_target, pred))
 
-logger.info("Some metrics in full data")
-estimator.fit(X=raw_data, y=class_target)
-pred = estimator.predict(raw_data)
-print(metrics.accuracy_score(class_target, pred))
-print(metrics.classification_report(class_target, pred))
