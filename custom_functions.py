@@ -80,3 +80,5 @@ def create_estimator(ml_obj, numeric_features, cat_features, date_features):
         ('Model_fitting', ml_obj)
     ])
     return estimator
+#TODO:
+#make custom score
